@@ -1,0 +1,6 @@
+[submodule "src/libescpos"]
+	path = src/libescpos
+	url = git@github.com:bwisn/libescpos.git
+[submodule "src/libnetthermprint"]
+	path = src/libnetthermprint
+	url = git@github.com:bwisn/libnetthermprint.git
