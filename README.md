@@ -16,3 +16,4 @@ Create config.h file in root directory:
 const uint8_t SERVER_IP[4] = {8, 8, 4, 4}; // change to your server ip
 #endif
 ```
+Connect your printer RX to D4 pin on your board.
