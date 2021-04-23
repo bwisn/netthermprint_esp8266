@@ -1,6 +1,6 @@
 [submodule "lib/libescpos"]
-path=lib/libescpos
-url=git@github.com:bwisn/libescpos.git
+	path = lib/libescpos
+	url = https://github.com/bwisn/libescpos
 [submodule "lib/libnetthermprint"]
-path=lib/libnetthermprint
-url=git@github.com:bwisn/libnetthermprint.git
+	path = lib/libnetthermprint
+	url = https://github.com/bwisn/libnetthermprint
