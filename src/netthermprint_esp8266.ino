@@ -1,15 +1,18 @@
-#include "config.h"
-#include "src/libescpos/libescpos.h"
-#include "src/libnetthermprint/libnetthermprint.h"
 #include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <config.h>
+#include <libescpos.h>
+#include <libnetthermprint.h>
 
-/* Create config.h file such as below
+/* Create include/config.h file such as below
 #ifndef CONFIG_H
 #define CONFIG_H
+#include <cstdint>
 #define WIFI_SSID "changeme"
 #define WIFI_PASSWD "changeme"
+#define WIFI_SSID2 "changeme"
+#define WIFI_PASSWD2 "hackme"
 
 const uint8_t SERVER_IP[4] = {8, 8, 4, 4}; // change to your server ip
 
@@ -25,67 +28,67 @@ int port = 41230;
 IPAddress serverIp(SERVER_IP[0], SERVER_IP[1], SERVER_IP[2], SERVER_IP[3]);
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP(WIFI_SSID, WIFI_PASSWD);
-  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWD2);
-  // wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWD3);
+    WiFi.mode(WIFI_STA);
+    wifiMulti.addAP(WIFI_SSID, WIFI_PASSWD);
+    wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWD2);
+    // wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWD3);
 
-  Serial.println("Connecting to Wifi...");
+    Serial.println("Connecting to Wifi...");
 
-  uint8_t try_count = 0;
+    uint8_t try_count = 0;
 
-  while (wifiMulti.run() != WL_CONNECTED) {
-    if (try_count > 5) {
-      Serial.println("Cannot connect to WiFi, rebooting!");
-      ESP.restart();
+    while (wifiMulti.run() != WL_CONNECTED) {
+        if (try_count > 5) {
+            Serial.println("Cannot connect to WiFi, rebooting!");
+            ESP.restart();
+        }
+        Serial.println("WiFi not connected!");
+        delay(1000);
+        ++try_count;
     }
-    Serial.println("WiFi not connected!");
-    delay(1000);
-    ++try_count;
-  }
 
-  if (wifiMulti.run() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-  }
+    if (wifiMulti.run() == WL_CONNECTED) {
+        Serial.println("");
+        Serial.println("WiFi connected");
+        Serial.println("IP address: ");
+        Serial.println(WiFi.localIP());
+    }
 
-  ArduinoOTA.setHostname("netthermprint-8266");
-  ArduinoOTA.begin();
+    ArduinoOTA.setHostname("netthermprint-8266");
+    ArduinoOTA.begin();
 
-  pinMode(0, INPUT_PULLUP);
-  Serial1.begin(9600);
-  UDP.begin(port);
+    pinMode(0, INPUT_PULLUP);
+    Serial1.begin(9600);
+    UDP.begin(port);
 }
 
 void EscPos_sendCh(char a) { Serial1.write(a); }
 
 void loop() {
-  ArduinoOTA.handle();
-  int packetSize = UDP.parsePacket();
-  if (packetSize) {
-    char *packet = new char[packetSize];
-    int len = UDP.read(packet, packetSize);
-    if (len > 0) {
-      netprint.processData(packet);
+    ArduinoOTA.handle();
+    int packetSize = UDP.parsePacket();
+    if (packetSize) {
+        char *packet = new char[packetSize];
+        int len = UDP.read(packet, packetSize);
+        if (len > 0) {
+            netprint.processData(packet);
+        }
+        delete[] packet;
     }
-    delete[] packet;
-  }
-  netprint.timerLoop();
+    netprint.timerLoop();
 }
 void NetThermPrint_sendUdpResponse(const char *data, size_t len) {
-  UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
-  UDP.write(data, len);
-  UDP.endPacket();
+    UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
+    UDP.write(data, len);
+    UDP.endPacket();
 }
 
 void NetThermPrint_sendUdp(const char *data, size_t len) {
-  UDP.beginPacket(serverIp, port);
-  UDP.write(data, len);
-  UDP.endPacket();
+    UDP.beginPacket(serverIp, port);
+    UDP.write(data, len);
+    UDP.endPacket();
 }
 
 time_t NetThermPrint_getTime() { return millis(); }

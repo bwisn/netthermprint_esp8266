@@ -1,4 +1,5 @@
-config.h
+include/config.h
+*/config.h
 .vscode/
 .pioenvs
 .piolibdeps
